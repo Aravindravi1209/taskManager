@@ -15,7 +15,7 @@ public class TasksServiceTests {
     @Test
     public void testCreateTask()
     {
-        TasksService tasksService = new TasksService(tasksRepository);
+        TasksService tasksService = new TasksService(tasksRepository, notesRepository);
         TaskEntity task = tasksService.createTask("title", "description", new Date());
         System.out.println(task);
     }

@@ -41,20 +41,26 @@ public class NotesService {
     public NotesEntity getNoteByNotesId(Long id, Long noteId)
     {
         List<NotesEntity> notes = tasksRepository.findById(id).get().getNotes();
-        if(noteId>=notes.size())
+        for(NotesEntity notes1 : notes)
         {
-            throw new IndexOutOfBoundsException("Note not found");
+            if(notes1.getId()==noteId)
+            {
+                return notes1;
+            }
         }
-        return notes.get(noteId.intValue());
+        throw new IllegalStateException("No such note exists");
     }
 
     public void deleteNoteById(Long id, Long noteId)
     {
         List<NotesEntity> notes = tasksRepository.findById(id).get().getNotes();
-        if(noteId>=notes.size())
+        for(NotesEntity notes1 : notes)
         {
-            throw new IndexOutOfBoundsException("Note not found");
+            if(notes1.getId()==noteId)
+            {
+                notesRepository.delete(notes1);
+                break;
+            }
         }
-        notesRepository.delete(notes.get(noteId.intValue()));
     }
 }

@@ -2,6 +2,8 @@ package com.arav.taskManager.tasks;
 
 import com.arav.taskManager.exceptions.EmptyTasksException;
 import com.arav.taskManager.exceptions.NoSuchTaskExistException;
+import com.arav.taskManager.notes.NotesEntity;
+import com.arav.taskManager.notes.NotesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +14,13 @@ import java.util.List;
 @Service
 public class TasksService {
     private final TasksRepository tasksRepository;
+    private final NotesRepository notesRepository;
 
 
     @Autowired
-    public TasksService(TasksRepository tasksRepository) {
+    public TasksService(TasksRepository tasksRepository, NotesRepository notesRepository) {
         this.tasksRepository = tasksRepository;
+        this.notesRepository = notesRepository;
     }
 
     public TaskEntity createTask(String title, String description, Date dueDate) {
@@ -60,6 +64,13 @@ public class TasksService {
 
     public void deleteTaskById(Long id)
     {
+        List<NotesEntity> notes = tasksRepository.findById(id).get().getNotes();
+        List<Long> toDelete = new ArrayList<>();
+        for(NotesEntity notes1 : notes)
+        {
+            toDelete.add(notes1.getId());
+        }
+        notesRepository.deleteAllById(toDelete);
         tasksRepository.deleteById(id);
     }
 
