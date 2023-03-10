@@ -47,4 +47,14 @@ public class NotesService {
         }
         return notes.get(noteId.intValue());
     }
+
+    public void deleteNoteById(Long id, Long noteId)
+    {
+        List<NotesEntity> notes = tasksRepository.findById(id).get().getNotes();
+        if(noteId>=notes.size())
+        {
+            throw new IndexOutOfBoundsException("Note not found");
+        }
+        notesRepository.delete(notes.get(noteId.intValue()));
+    }
 }

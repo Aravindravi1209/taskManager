@@ -36,4 +36,10 @@ public class NotesController {
     {
         return notesService.getNoteByNotesId(id, noteId);
     }
+
+    @DeleteMapping("/notes/{noteId}")
+    public void deleteNoteById(@PathVariable("id") Long id, @PathVariable("noteId") Long noteId)
+    {
+        notesService.deleteNoteById(id, noteId);
+    }
 }
