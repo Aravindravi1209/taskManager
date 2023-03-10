@@ -1,8 +1,10 @@
 package com.arav.taskManager.tasks;
 
+import com.arav.taskManager.exceptions.EmptyTasksException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,12 +24,17 @@ public class TasksService {
         task.setDescription(description);
         task.setDueDate(dueDate);
         task.setCompleted(false);
+        task.setNotes(new ArrayList<>());
         return tasksRepository.save(task);
     }
 
-    public List<TaskEntity> getTasks()
-    {
-        return tasksRepository.findAll();
+    public List<TaskEntity> getTasks() throws EmptyTasksException {
+        List<TaskEntity> tasks = tasksRepository.findAll();
+        if(tasks.size()==0)
+        {
+            throw new EmptyTasksException("No tasks found");
+        }
+        return tasks;
     }
 
     public TaskEntity getTaskById(Long id)

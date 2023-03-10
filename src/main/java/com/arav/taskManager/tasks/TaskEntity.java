@@ -1,15 +1,14 @@
 package com.arav.taskManager.tasks;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.arav.taskManager.notes.NotesEntity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,6 +25,9 @@ public class TaskEntity{
     private String description;
     private Boolean completed;
     private Date dueDate;
+
+    @OneToMany(mappedBy = "task")
+    private List<NotesEntity> notes;
 
 
 

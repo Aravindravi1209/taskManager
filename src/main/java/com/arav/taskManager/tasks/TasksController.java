@@ -1,5 +1,6 @@
 package com.arav.taskManager.tasks;
 
+import com.arav.taskManager.exceptions.EmptyTasksException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +18,7 @@ public class TasksController {
 
     //GETTING ALL TASKS
     @GetMapping("/all")
-    public List<TaskEntity> getAllTasks()
-    {
+    public List<TaskEntity> getAllTasks() throws EmptyTasksException {
         return tasksService.getTasks();
     }
 
