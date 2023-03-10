@@ -16,15 +16,24 @@ public class NotesController {
         this.notesService = notesService;
     }
 
+    //CREATE NOTES UNDER A TASK ID
     @PostMapping("/notes")
     public NotesEntity createNote(@PathVariable("id") Long id, @RequestBody NotesEntity notesEntity)
     {
         return notesService.createNote(id, notesEntity.getTitle(), notesEntity.getDescription());
     }
 
+    //GET NOTES BY TASK ID
     @GetMapping("/notes")
     public List<NotesEntity> getNotesById(@PathVariable("id") Long id)
     {
         return notesService.getNotesById(id);
+    }
+
+    //GET NOTES BY TASK ID AND NOTE ID
+    @GetMapping("/notes/{noteId}")
+    public NotesEntity getNoteById(@PathVariable("id") Long id, @PathVariable("noteId") Long noteId)
+    {
+        return notesService.getNoteByNotesId(id, noteId);
     }
 }

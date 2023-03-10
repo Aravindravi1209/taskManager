@@ -1,6 +1,7 @@
 package com.arav.taskManager.tasks;
 
 import com.arav.taskManager.exceptions.EmptyTasksException;
+import com.arav.taskManager.exceptions.NoSuchTaskExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +46,21 @@ public class TasksService {
     public List<TaskEntity> getTasksByCompletedStatus(Boolean status)
     {
         return tasksRepository.findByCompleted(status);
+    }
+
+    public TaskEntity markTaskAsCompleted(Long id) throws NoSuchTaskExistException {
+        TaskEntity task = tasksRepository.findById(id).orElse(null);
+        if(task==null)
+        {
+            throw new NoSuchTaskExistException("No such task exists");
+        }
+        task.setCompleted(true);
+        return tasksRepository.save(task);
+    }
+
+    public void deleteTaskById(Long id)
+    {
+        tasksRepository.deleteById(id);
     }
 
 }

@@ -37,4 +37,14 @@ public class NotesService {
     {
         return tasksRepository.findById(id).get().getNotes();
     }
+
+    public NotesEntity getNoteByNotesId(Long id, Long noteId)
+    {
+        List<NotesEntity> notes = tasksRepository.findById(id).get().getNotes();
+        if(noteId>=notes.size())
+        {
+            throw new IndexOutOfBoundsException("Note not found");
+        }
+        return notes.get(noteId.intValue());
+    }
 }

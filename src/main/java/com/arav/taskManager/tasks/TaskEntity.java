@@ -1,6 +1,7 @@
 package com.arav.taskManager.tasks;
 
 import com.arav.taskManager.notes.NotesEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class TaskEntity{
     private String title;
     private String description;
     private Boolean completed;
+    @JsonFormat(pattern="dd-MM-yyyy")
     private Date dueDate;
 
     @OneToMany(mappedBy = "task")
