@@ -3,10 +3,7 @@ package com.arav.taskManager.tasks;
 import com.arav.taskManager.notes.NotesEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
@@ -22,10 +19,12 @@ public class TaskEntity{
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
     private String description;
     private Boolean completed;
-    @JsonFormat(pattern="dd-MM-yyyy")
+    @Column(nullable = false)
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date dueDate;
 
     @OneToMany(mappedBy = "task")

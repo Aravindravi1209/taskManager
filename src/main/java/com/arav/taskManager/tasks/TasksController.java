@@ -1,11 +1,19 @@
 package com.arav.taskManager.tasks;
 
+import com.arav.taskManager.common.ErrorResponseDto;
 import com.arav.taskManager.exceptions.EmptyTasksException;
 import com.arav.taskManager.exceptions.NoSuchTaskExistException;
+import com.arav.taskManager.tasks.dtos.CreateTaskRequestDto;
+import com.arav.taskManager.tasks.dtos.CreateTaskResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
 @RequestMapping("/tasks")
@@ -25,9 +33,12 @@ public class TasksController {
 
     //GETTING TASK BY ID
     @GetMapping("/{id}")
-    public TaskEntity getTaskById(@PathVariable("id") Long id)
+    public ResponseEntity<CreateTaskResponseDto> getTaskById(@PathVariable("id") Long id)
     {
-        return tasksService.getTaskById(id);
+        CreateTaskResponseDto responseDto = tasksService.getTaskById(id);
+        return ResponseEntity
+                .ok()
+                .body(responseDto);
     }
 
     //GETTING TASKS BY COMPLETED STATUS FILTER
@@ -39,9 +50,12 @@ public class TasksController {
 
     //CREATION OF TASKS
     @PostMapping("/add")
-    public TaskEntity createTask(@RequestBody TaskEntity taskEntity)
+    public ResponseEntity<CreateTaskResponseDto> createTask(@RequestBody CreateTaskRequestDto requestDto)
     {
-        return tasksService.createTask(taskEntity.getTitle(), taskEntity.getDescription(), taskEntity.getDueDate());
+        CreateTaskResponseDto responseDto = tasksService.createTask(requestDto);
+        return ResponseEntity
+                .created(URI.create("/tasks/"+responseDto.getId()))
+                .body(responseDto);
     }
 
     //MARKING TASK AS COMPLETED
@@ -55,6 +69,27 @@ public class TasksController {
     public void deleteTaskById(@PathVariable("id") Long id)
     {
         tasksService.deleteTaskById(id);
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class,
+            EmptyTasksException.class,
+            NoSuchTaskExistException.class,
+            HttpMessageNotReadableException.class})
+    public ResponseEntity<ErrorResponseDto> handleException(Exception e)
+    {
+        if(e instanceof NoSuchTaskExistException)
+            return ResponseEntity
+                    .status(NOT_FOUND)
+                    .body(new ErrorResponseDto(e.getMessage()));
+
+        if(e instanceof HttpMessageNotReadableException)
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ErrorResponseDto("Invalid request body"));
+
+        return ResponseEntity
+                .badRequest()
+                .body(new ErrorResponseDto(e.getMessage()));
     }
 
 }

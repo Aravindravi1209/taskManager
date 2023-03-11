@@ -4,6 +4,9 @@ import com.arav.taskManager.exceptions.EmptyTasksException;
 import com.arav.taskManager.exceptions.NoSuchTaskExistException;
 import com.arav.taskManager.notes.NotesEntity;
 import com.arav.taskManager.notes.NotesRepository;
+import com.arav.taskManager.tasks.dtos.CreateTaskRequestDto;
+import com.arav.taskManager.tasks.dtos.CreateTaskResponseDto;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,35 +19,41 @@ public class TasksService {
     private final TasksRepository tasksRepository;
     private final NotesRepository notesRepository;
 
+    private final ModelMapper modelMapper;
+
 
     @Autowired
-    public TasksService(TasksRepository tasksRepository, NotesRepository notesRepository) {
+    public TasksService(TasksRepository tasksRepository, NotesRepository notesRepository, ModelMapper modelMapper) {
         this.tasksRepository = tasksRepository;
         this.notesRepository = notesRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public TaskEntity createTask(String title, String description, Date dueDate) {
-        TaskEntity task = new TaskEntity();
-        task.setTitle(title);
-        task.setDescription(description);
-        task.setDueDate(dueDate);
+    public CreateTaskResponseDto createTask(CreateTaskRequestDto newTask) {
+        //Date Validation
+        if(newTask.getDueDate().before(new Date()))
+        {
+            throw new IllegalArgumentException("Due date cannot be before today");
+        }
+        TaskEntity task = modelMapper.map(newTask, TaskEntity.class);
         task.setCompleted(false);
         task.setNotes(new ArrayList<>());
-        return tasksRepository.save(task);
+        TaskEntity savedTask = tasksRepository.save(task);
+        return modelMapper.map(savedTask, CreateTaskResponseDto.class);
     }
 
     public List<TaskEntity> getTasks() throws EmptyTasksException {
         List<TaskEntity> tasks = tasksRepository.findAll();
         if(tasks.size()==0)
         {
-            throw new EmptyTasksException("No tasks found");
+            throw new EmptyTasksException("No tasks exist");
         }
         return tasks;
     }
 
-    public TaskEntity getTaskById(Long id)
-    {
-        return tasksRepository.findById(id).orElse(null);
+    public CreateTaskResponseDto getTaskById(Long id) throws NoSuchTaskExistException {
+        TaskEntity task = tasksRepository.findById(id).orElseThrow(() -> new NoSuchTaskExistException(id));
+        return modelMapper.map(task, CreateTaskResponseDto.class);
     }
 
     public List<TaskEntity> getTasksByCompletedStatus(Boolean status)
@@ -56,7 +65,7 @@ public class TasksService {
         TaskEntity task = tasksRepository.findById(id).orElse(null);
         if(task==null)
         {
-            throw new NoSuchTaskExistException("No such task exists");
+            throw new NoSuchTaskExistException(id);
         }
         task.setCompleted(true);
         return tasksRepository.save(task);
